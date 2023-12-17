@@ -26,6 +26,10 @@
 
       </div>
 
+      <div class="w-full fixed bottom-20">
+        <v-btn>Save to registry</v-btn>
+      </div>
+
     </div>
 
   </div>
