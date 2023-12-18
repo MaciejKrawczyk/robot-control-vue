@@ -181,9 +181,9 @@ const dialog = ref(false)
 const commands = ref([]);
 const name = ref('');
 const description = ref('');
+const selectedItem = ref(null);
 
-
-onMounted(async () => {
+const fetchPrograms = async () => {
   try {
     const response = await fetch('http://localhost:5000/api/program');
     if (!response.ok) {
@@ -194,7 +194,40 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error:', error);
   }
-});
+};
+
+onMounted(fetchPrograms);
+
+const deleteProgram = () => {
+  if (selectedItem.value && selectedItem.value.id) {
+    const programId = selectedItem.value.id;
+
+    fetch('http://localhost:5000/api/program', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({id: programId}),
+    })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Program deleted:', data);
+          fetchPrograms();
+          selectedItem.value = null;
+        })
+        .catch(error => {
+          console.error('Error deleting program:', error);
+        });
+  } else {
+    console.error('No program selected');
+  }
+}
+
 
 const submitForm = async () => {
   const body = {
@@ -221,9 +254,8 @@ const submitForm = async () => {
     console.error('Error:', error);
   } finally {
     dialog.value = false;
+    fetchPrograms();
   }
-
-  dialog.value = false;
 };
 
 const addSleep = () => {
@@ -246,38 +278,11 @@ export default {
     return {
       dialog: false,
       items: [],
-      selectedItem: null
+      // selectedItem: null
     }
   },
   methods: {
-    deleteProgram() {
-      if (this.selectedItem && this.selectedItem.id) {
-        const programId = this.selectedItem.id;
 
-        fetch('http://localhost:5000/api/program', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({id: programId}),
-        })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
-              return response.json();
-            })
-            .then(data => {
-              console.log('Program deleted:', data);
-              // You might want to update your component's state here
-            })
-            .catch(error => {
-              console.error('Error deleting program:', error);
-            });
-      } else {
-        console.error('No program selected');
-      }
-    }
   }
 }
 </script>
