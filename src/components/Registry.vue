@@ -23,7 +23,7 @@
         >
           <td>{{ register.id }}</td>
           <td class="flex justify-between items-center">
-            {{ register.data }}
+            {{ register.Position.x }}, {{ register.Position.y }}, {{ register.Position.z }}, {{ register.Position.alfa }}, {{ register.Position.beta }}, {{ register.Position.gamma }}
 
             <v-btn size="small">
               X
@@ -49,6 +49,7 @@ export default {
     fetch('http://localhost:5000/api/registry')
         .then(response => response.json())
         .then(data => {
+          console.log(data)
           this.registry = data;
         })
         .catch(error => console.error('Error:', error));

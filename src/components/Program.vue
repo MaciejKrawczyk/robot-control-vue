@@ -67,12 +67,12 @@
           </div>
           <div>
             <v-select
+                v-model="selectedItem"
                 class="my-5"
-                v-model="select"
                 hint="Choose program"
                 :items="items"
-                item-title="state"
-                item-value="abbr"
+                item-title="name"
+                item-value="description"
                 label="Select"
                 persistent-hint
                 return-object
@@ -84,7 +84,7 @@
                 width="1024"
             >
               <template v-slot:activator="{ props }">
-                <div  class="flex justify-between w-full">
+                <div class="flex justify-between w-full">
                   <v-btn
                       color="primary"
                       v-bind="props"
@@ -101,35 +101,31 @@
                   <span class="text-h5">New Program</span>
                 </v-card-title>
                 <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                      >
-                        <v-text-field
-                            name="name"
-                            label="Name*"
-                            persistent-hint="true"
-                            hint="Name of the program"
-                            required
-                        ></v-text-field>
-                      </v-col>
-                      <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                      >
-                        <v-text-field
-                            name="description"
-                            label="Description"
-                            hint="Short description of the program"
-                            persistent-hint="true"
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
-                  </v-container>
+                  <v-form validate-on="submit lazy" @submit.prevent="submitForm">
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12" sm="6" md="4">
+                          <v-text-field
+                              v-model="name"
+                              name="name"
+                              label="Name*"
+                              hint="Name of the program"
+                              persistent-hint
+                              required
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                          <v-text-field
+                              v-model="description"
+                              name="description"
+                              label="Description"
+                              hint="Short description of the program"
+                              persistent-hint
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-form>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
@@ -143,7 +139,7 @@
                   <v-btn
                       color="blue-darken-1"
                       variant="text"
-                      @click="dialog = false"
+                      @click="submitForm"
                   >
                     Save
                   </v-btn>
@@ -177,36 +173,68 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
+import { ref, onMounted } from 'vue';
 
-const select = ref({ state: 'Florida', abbr: 'FL' })
-
-const items = [
-  { state: 'Florida', abbr: 'FL' },
-  { state: 'Georgia', abbr: 'GA' },
-  { state: 'Nebraska', abbr: 'NE' },
-  { state: 'California', abbr: 'CA' },
-  { state: 'New York', abbr: 'NY' },
-]
+const items = ref([]);
 
 const dialog = ref(false)
 const commands = ref([]);
-// const sleeps = ref([]);
-// const trajectoriesFromCurrentPosition = ref([]);
-// const trajectoriesFromRegistry = ref([]);
+const name = ref('');
+const description = ref('');
+
+
+onMounted(async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/program');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    items.value = data;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+
+const submitForm = async () => {
+  const body = {
+    name: name.value,
+    description: description.value
+  };
+
+  try {
+    const response = await fetch('http://localhost:5000/api/program', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Success:', data);
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    dialog.value = false;
+  }
+
+  dialog.value = false;
+};
 
 const addSleep = () => {
-  // sleeps.value.unshift('sleep');
   commands.value.unshift('sleep');
 };
 
 const addTrajectoryFromRegistry = () => {
-  // trajectoriesFromRegistry.value.unshift('regTraj');
   commands.value.unshift('regTraj');
 }
 
 const addTrajectoryFromCurrentPosition = () => {
-  // trajectoriesFromCurrentPosition.value.unshift('currTraj');
   commands.value.unshift('currTraj');
 }
 
@@ -214,17 +242,11 @@ const addTrajectoryFromCurrentPosition = () => {
 
 <script lang="ts">
 export default {
-  data () {
+  data() {
     return {
       dialog: false,
-      select: { state: 'Florida', abbr: 'FL' },
-      items: [
-        { state: 'Florida', abbr: 'FL' },
-        { state: 'Georgia', abbr: 'GA' },
-        { state: 'Nebraska', abbr: 'NE' },
-        { state: 'California', abbr: 'CA' },
-        { state: 'New York', abbr: 'NY' },
-      ],
+      items: [],
+      selectedItem: null
     }
   },
 }
