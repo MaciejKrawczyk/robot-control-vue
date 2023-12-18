@@ -173,22 +173,24 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, watch} from 'vue';
 
-const items = ref([]);
-
-const dialog = ref(false)
+const dialog = ref(false);
 const commands = ref([]);
 const name = ref('');
 const description = ref('');
 const selectedItem = ref(null);
+const items = ref([]);
+
+watch(selectedItem, (newVal) => {
+  if (newVal && newVal.id) {
+    fetchCommands(newVal.id);
+  }
+});
 
 const fetchPrograms = async () => {
   try {
     const response = await fetch('http://localhost:5000/api/program');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
     const data = await response.json();
     items.value = data;
   } catch (error) {
@@ -196,58 +198,50 @@ const fetchPrograms = async () => {
   }
 };
 
+const fetchCommands = async (programId) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/command?program_id=${programId}`);
+    const data = await response.json();
+    commands.value = data;
+    console.log(data)
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 onMounted(fetchPrograms);
 
-const deleteProgram = () => {
+const deleteProgram = async () => {
   if (selectedItem.value && selectedItem.value.id) {
-    const programId = selectedItem.value.id;
-
-    fetch('http://localhost:5000/api/program', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({id: programId}),
-    })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Program deleted:', data);
-          fetchPrograms();
-          selectedItem.value = null;
-        })
-        .catch(error => {
-          console.error('Error deleting program:', error);
-        });
+    try {
+      const response = await fetch('http://localhost:5000/api/program', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({id: selectedItem.value.id}),
+      });
+      const data = await response.json();
+      console.log('Program deleted:', data);
+      fetchPrograms();
+      selectedItem.value = null;
+    } catch (error) {
+      console.error('Error deleting program:', error);
+    }
   } else {
     console.error('No program selected');
   }
-}
-
+};
 
 const submitForm = async () => {
-  const body = {
-    name: name.value,
-    description: description.value
-  };
-
   try {
     const response = await fetch('http://localhost:5000/api/program', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({name: name.value, description: description.value}),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     const data = await response.json();
     console.log('Success:', data);
   } catch (error) {
@@ -258,18 +252,13 @@ const submitForm = async () => {
   }
 };
 
-const addSleep = () => {
-  commands.value.unshift('sleep');
+const addCommand = (command) => {
+  commands.value.unshift(command);
 };
 
-const addTrajectoryFromRegistry = () => {
-  commands.value.unshift('regTraj');
-}
-
-const addTrajectoryFromCurrentPosition = () => {
-  commands.value.unshift('currTraj');
-}
-
+const addSleep = () => addCommand('sleep');
+const addTrajectoryFromRegistry = () => addCommand('regTraj');
+const addTrajectoryFromCurrentPosition = () => addCommand('currTraj');
 </script>
 
 <script lang="ts">
@@ -281,8 +270,6 @@ export default {
       // selectedItem: null
     }
   },
-  methods: {
-
-  }
+  methods: {}
 }
 </script>
