@@ -8,21 +8,21 @@
 
       <div class="w-full flex justify-center flex-col">
 
-        <Jog title="alfa" />
+        <Jog title="alfa" :value="alfa" />
 
-        <Jog title="beta" />
+        <Jog title="beta" :value="beta" />
 
-        <Jog title="gamma" />
+        <Jog title="gamma" :value="gamma" />
 
       </div>
 
       <div class="w-full flex justify-center flex-col">
 
-        <Jog title="x" />
+        <Jog title="x" :value="x" />
 
-        <Jog title="y" />
+        <Jog title="y" :value="y" />
 
-        <Jog title="z" />
+        <Jog title="z" :value="z" />
 
       </div>
 
@@ -30,7 +30,7 @@
 
         <Speed title="Speed (%)" />
 
-        <v-btn>Save to registry</v-btn>
+        <v-btn @click="saveToRegistry">Save to registry</v-btn>
       </div>
 
     </div>
@@ -44,7 +44,41 @@ import Jog from './Jog.vue'
 import Speed from "./Speed.vue";
 </script>
 
-<script setup lang="ts">
+<script lang="ts">
+export default {
+  inject: ['alfa', 'beta', 'gamma', 'x', 'y', 'z'],
+  data() {
+    return {
+      alfa: 0,
+      beta: 0,
+      gamma: 0,
+      x: 0,
+      y: 0,
+      z: 0
+    }
+  },
+  methods: {
+    saveToRegistry() {
+      const body = {
+        'x': this.x,
+        'y': this.y,
+        'z': this.z,
+        'alfa': this.alfa,
+        'beta': this.beta,
+        'gamma': this.gamma
+      };
 
-
+      fetch('http://localhost:5000/api/registry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+          .then(response => response.json())
+          .then(data => console.log('Success:', data))
+          .catch((error) => console.error('Error:', error));
+    }
+  }
+}
 </script>

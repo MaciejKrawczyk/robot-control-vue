@@ -38,91 +38,20 @@
   </div>
 </template>
 
-
 <script lang="ts">
 export default {
   data() {
     return {
-      registry: [
-        {
-          id: 1,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 2,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 3,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 4,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 5,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 6,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-        {
-          id: 7,
-          data: {
-            x: 1,
-            y: 2,
-            z: 3,
-            alfa: 120,
-            beta: 50,
-            gamma: 30,
-          }
-        },
-      ],
+      registry: [],
     }
+  },
+  mounted() {
+    fetch('http://localhost:5000/api/registry')
+        .then(response => response.json())
+        .then(data => {
+          this.registry = data;
+        })
+        .catch(error => console.error('Error:', error));
   },
 }
 </script>

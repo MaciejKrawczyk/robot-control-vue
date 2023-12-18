@@ -84,12 +84,17 @@
                 width="1024"
             >
               <template v-slot:activator="{ props }">
-                <v-btn
-                    color="primary"
-                    v-bind="props"
-                >
-                  Add new Program
-                </v-btn>
+                <div  class="flex justify-between w-full">
+                  <v-btn
+                      color="primary"
+                      v-bind="props"
+                  >
+                    Add new Program
+                  </v-btn>
+                  <v-btn>
+                    DELETE PROGRAM
+                  </v-btn>
+                </div>
               </template>
               <v-card>
                 <v-card-title>
