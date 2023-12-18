@@ -2,8 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Manual from "./components/Manual.vue";
 import Program from "./components/Program.vue";
 import Registry from "./components/Registry.vue";
+import Home from "./components/Home.vue";
 
 const routes = [
+  {
+    path: '/',
+    name: 'home',
+    component: Home
+  },
   {
     path: '/manual',
     name: 'manual',
