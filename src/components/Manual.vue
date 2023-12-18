@@ -27,6 +27,9 @@
       </div>
 
       <div class="w-full fixed bottom-20">
+
+        <Speed title="Speed (%)" />
+
         <v-btn>Save to registry</v-btn>
       </div>
 
@@ -38,6 +41,7 @@
 
 <script setup lang="ts">
 import Jog from './Jog.vue'
+import Speed from "./Speed.vue";
 </script>
 
 <script setup lang="ts">
