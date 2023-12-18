@@ -7,7 +7,6 @@
 
       <div class="w-full h-auto bg-gray-200 flex items-center flex-col p-4">
 
-
         <div
             v-for="(cmd, index) in commands"
             :key="index"
@@ -17,14 +16,7 @@
               v-if="cmd.type === 'sleep'"
               class="w-full bg-amber-200 h-auto mb-2 flex items-center justify-between p-2 rounded-lg"
           >
-            <div class="w-1/3 text-center">{{ cmd.type }}</div>
-            <v-select
-                density="compact"
-                label="Number of seconds"
-                :items="[1,2,3,4,5,6,7]"
-                hint="Choose the number of seconds to sleep"
-                persistent-hint
-            ></v-select>
+            <div class="w-1/3 text-center">{{ cmd.type }} for 1 second</div>
             <v-btn size="small" class="ml-2" @click.prevent="deleteCommand(cmd.id)">
               X
             </v-btn>
