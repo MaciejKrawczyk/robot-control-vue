@@ -25,7 +25,7 @@
                 hint="Choose the number of seconds to sleep"
                 persistent-hint
             ></v-select>
-            <v-btn size="small" class="ml-2">
+            <v-btn size="small" class="ml-2" @click.prevent="deleteCommand(cmd.id)">
               X
             </v-btn>
           </div>
@@ -42,7 +42,7 @@
                 hint="Choose the Registry ID"
                 persistent-hint
             ></v-select>
-            <v-btn size="small" class="ml-2">
+            <v-btn size="small" class="ml-2" @click.prevent="deleteCommand(cmd.id)">
               X
             </v-btn>
           </div>
@@ -52,7 +52,7 @@
               class="w-full bg-amber-400 h-auto mb-2 flex items-center justify-between p-2 rounded-lg"
           >
             <div class="w-1/3 text-center">{{ cmd.type }}</div>
-            <v-btn size="small" class="ml-2">
+            <v-btn size="small" class="ml-2" @click.prevent="deleteCommand(cmd.id)">
               X
             </v-btn>
           </div>
@@ -188,7 +188,19 @@ watch(selectedItem, (newVal) => {
   }
 });
 
-
+const deleteCommand = async (commandId) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/command?command_id=${commandId}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+    console.log('Command deleted:', data);
+    // After deleting, fetch the commands again to update the list
+    await fetchCommands(selectedItem.value.id);
+  } catch (error) {
+    console.error('Error deleting command:', error);
+  }
+};
 
 const fetchPrograms = async () => {
   try {
