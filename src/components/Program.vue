@@ -14,10 +14,10 @@
             class="w-full"
         >
           <div
-              v-if="cmd === 'sleep'"
+              v-if="cmd.type === 'sleep'"
               class="w-full bg-amber-200 h-auto mb-2 flex items-center justify-between p-2 rounded-lg"
           >
-            <div class="w-1/3 text-center">{{ cmd }}</div>
+            <div class="w-1/3 text-center">{{ cmd.type }}</div>
             <v-select
                 density="compact"
                 label="Number of seconds"
@@ -31,10 +31,10 @@
           </div>
 
           <div
-              v-if="cmd === 'regTraj'"
+              v-if="cmd.type === 'regPos'"
               class="w-full bg-amber-300 h-auto mb-2 flex items-center justify-between p-2 rounded-lg"
           >
-            <div class="w-1/3 text-center">{{ cmd }}</div>
+            <div class="w-1/3 text-center">{{ cmd.type }}</div>
             <v-select
                 density="compact"
                 label="Registry ID"
@@ -48,10 +48,10 @@
           </div>
 
           <div
-              v-if="cmd === 'currTraj'"
+              v-if="cmd.type === 'currPos'"
               class="w-full bg-amber-400 h-auto mb-2 flex items-center justify-between p-2 rounded-lg"
           >
-            <div class="w-1/3 text-center">{{ cmd }}</div>
+            <div class="w-1/3 text-center">{{ cmd.type }}</div>
             <v-btn size="small" class="ml-2">
               X
             </v-btn>
@@ -188,6 +188,8 @@ watch(selectedItem, (newVal) => {
   }
 });
 
+
+
 const fetchPrograms = async () => {
   try {
     const response = await fetch('http://localhost:5000/api/program');
@@ -251,14 +253,32 @@ const submitForm = async () => {
     fetchPrograms();
   }
 };
+const postCommand = async (program_id, command_type) => {
+  try {
+    const response = await fetch('http://localhost:5000/api/command', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({program_id, command_type}),
+    });
+    const data = await response.json();
+    console.log('Command posted:', data);
+  } catch (error) {
+    console.error('Error posting command:', error);
+  }
+};
 
-const addCommand = (command) => {
-  commands.value.unshift(command);
+const addCommand = async (command) => {
+  // commands.value.unshift(command);
+  await postCommand(selectedItem.value.id, command);
+  fetchCommands(selectedItem.value.id);
 };
 
 const addSleep = () => addCommand('sleep');
-const addTrajectoryFromRegistry = () => addCommand('regTraj');
-const addTrajectoryFromCurrentPosition = () => addCommand('currTraj');
+const addTrajectoryFromRegistry = () => addCommand('regPos');
+const addTrajectoryFromCurrentPosition = () => addCommand('currPos');
+
 </script>
 
 <script lang="ts">
