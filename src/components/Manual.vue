@@ -47,16 +47,6 @@ import Speed from "./Speed.vue";
 <script lang="ts">
 export default {
   inject: ['alfa', 'beta', 'gamma', 'x', 'y', 'z'],
-  data() {
-    return {
-      alfa: 0,
-      beta: 0,
-      gamma: 0,
-      x: 0,
-      y: 0,
-      z: 0
-    }
-  },
   methods: {
     saveToRegistry() {
       const body = {

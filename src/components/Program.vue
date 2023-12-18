@@ -91,7 +91,7 @@
                   >
                     Add new Program
                   </v-btn>
-                  <v-btn>
+                  <v-btn @click.prevent="deleteProgram">
                     DELETE PROGRAM
                   </v-btn>
                 </div>
@@ -173,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 
 const items = ref([]);
 
@@ -249,5 +249,35 @@ export default {
       selectedItem: null
     }
   },
+  methods: {
+    deleteProgram() {
+      if (this.selectedItem && this.selectedItem.id) {
+        const programId = this.selectedItem.id;
+
+        fetch('http://localhost:5000/api/program', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({id: programId}),
+        })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('Program deleted:', data);
+              // You might want to update your component's state here
+            })
+            .catch(error => {
+              console.error('Error deleting program:', error);
+            });
+      } else {
+        console.error('No program selected');
+      }
+    }
+  }
 }
 </script>
